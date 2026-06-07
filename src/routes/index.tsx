@@ -846,26 +846,28 @@ const leadSchema = z.object({
   email: z.string().trim().email("Enter a valid email").max(160),
   phone: z.string().trim().min(7, "Enter a valid number").max(20),
   service: z.string().min(1, "Pick a service"),
-  budget: z.string().min(1, "Pick a budget"),
   details: z.string().trim().min(10, "Tell us a bit more").max(1500),
 });
 type LeadForm = z.infer<typeof leadSchema>;
 
 const SERVICE_OPTIONS = ["Website Development","E-Commerce","Software Development","AI Advertisement","Social Media Management","Poster & Creative Design","Digital Marketing"];
-const BUDGET_OPTIONS = ["Under ₹50k","₹50k – ₹1.5L","₹1.5L – ₹5L","₹5L – ₹15L","₹15L+"];
 
 function ContactSection() {
+  const sendLeadFn = useServerFn(sendLead);
   const form = useForm<LeadForm>({
     resolver: zodResolver(leadSchema),
-    defaultValues: { fullName: "", business: "", email: "", phone: "", service: "", budget: "", details: "" },
+    defaultValues: { fullName: "", business: "", email: "", phone: "", service: "", details: "" },
   });
 
   const onSubmit = async (data: LeadForm) => {
-    // Backend hookup: connect Resend + a leads table to deliver emails.
-    console.log("New lead:", data);
-    await new Promise((r) => setTimeout(r, 700));
-    toast.success("Thanks! We received your request — we'll reach out within 24 hours.");
-    form.reset();
+    try {
+      await sendLeadFn({ data });
+      toast.success("Thanks! We received your request — we'll reach out within 24 hours.");
+      form.reset();
+    } catch (err) {
+      console.error(err);
+      toast.error("Couldn't send right now. Please try again or email us directly.");
+    }
   };
 
   return (
@@ -884,12 +886,13 @@ function ContactSection() {
           </div>
 
           {[
-            { icon: Mail, label: "Email", value: "hello@productlens.studio", href: "mailto:hello@productlens.studio" },
-            { icon: Phone, label: "Phone", value: "+91 98765 43210", href: "tel:+919876543210" },
-            { icon: MessageCircle, label: "WhatsApp", value: "Chat with us", href: "https://wa.me/919876543210" },
-            { icon: MapPin, label: "Office", value: "Mumbai, Maharashtra, India" },
+            { icon: Mail, label: "Email", value: "contact.productlensstudio@gmail.com", href: "mailto:contact.productlensstudio@gmail.com" },
+            { icon: Phone, label: "Phone", value: "+91 9096801036", href: "tel:+919096801036" },
+            { icon: MessageCircle, label: "WhatsApp", value: "Chat with us", href: "https://wa.me/919096801036" },
+            { icon: Instagram, label: "Instagram", value: "@product_lens.studio", href: "https://www.instagram.com/product_lens.studio?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" },
+            { icon: MapPin, label: "Office", value: "Maharashtra, India" },
           ].map((c) => (
-            <a key={c.label} href={c.href ?? "#"} className="glass rounded-2xl p-5 flex items-center gap-4 hover:bg-white/5 transition-colors">
+            <a key={c.label} href={c.href ?? "#"} target={c.href?.startsWith("http") ? "_blank" : undefined} rel="noopener noreferrer" className="glass rounded-2xl p-5 flex items-center gap-4 hover:bg-white/5 transition-colors">
               <div className="size-11 rounded-xl bg-gradient-brand/20 grid place-items-center">
                 <c.icon className="size-5 text-brand-cyan" />
               </div>
@@ -919,18 +922,14 @@ function ContactSection() {
             <Field label="Mobile Number" error={form.formState.errors.phone?.message}>
               <Input {...form.register("phone")} placeholder="+91 98xxx xxxxx" className="bg-white/5 border-white/10 h-11" />
             </Field>
-            <Field label="Service Required" error={form.formState.errors.service?.message}>
-              <Select onValueChange={(v) => form.setValue("service", v, { shouldValidate: true })} value={form.watch("service")}>
-                <SelectTrigger className="bg-white/5 border-white/10 h-11"><SelectValue placeholder="Choose service" /></SelectTrigger>
-                <SelectContent>{SERVICE_OPTIONS.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
-              </Select>
-            </Field>
-            <Field label="Budget Range" error={form.formState.errors.budget?.message}>
-              <Select onValueChange={(v) => form.setValue("budget", v, { shouldValidate: true })} value={form.watch("budget")}>
-                <SelectTrigger className="bg-white/5 border-white/10 h-11"><SelectValue placeholder="Choose budget" /></SelectTrigger>
-                <SelectContent>{BUDGET_OPTIONS.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
-              </Select>
-            </Field>
+            <div className="md:col-span-2">
+              <Field label="Service Required" error={form.formState.errors.service?.message}>
+                <Select onValueChange={(v) => form.setValue("service", v, { shouldValidate: true })} value={form.watch("service")}>
+                  <SelectTrigger className="bg-white/5 border-white/10 h-11"><SelectValue placeholder="Choose service" /></SelectTrigger>
+                  <SelectContent>{SERVICE_OPTIONS.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
+                </Select>
+              </Field>
+            </div>
           </div>
           <Field label="Project Details" error={form.formState.errors.details?.message}>
             <Textarea {...form.register("details")} rows={5} placeholder="Tell us about your goals, timeline, and what success looks like."
