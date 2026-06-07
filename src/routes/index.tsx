@@ -7,13 +7,16 @@ import { z } from "zod";
 import { toast } from "sonner";
 import {
   ArrowRight, Sparkles, Code2, ShoppingBag, Cpu, Megaphone, Share2, Palette, TrendingUp,
-  Check, Mail, Phone, MapPin, MessageCircle, Instagram, Facebook, Linkedin, Star, Menu, X,
+  Check, Mail, Phone, MapPin, MessageCircle, Instagram, Star, Menu, X,
   Rocket, Target, Zap, Users, Award, HeadphonesIcon, BrainCircuit,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { useServerFn } from "@tanstack/react-start";
+import { sendLead } from "@/lib/send-lead.functions";
 import logoAsset from "@/assets/product-lens-logo.png.asset.json";
 
 export const Route = createFileRoute("/")({
@@ -231,17 +234,84 @@ function Hero() {
 
 /* ---------------- services ---------------- */
 
-const SERVICES = [
-  { icon: Code2, title: "Website Development", desc: "Custom business websites built for performance, SEO and conversions." },
-  { icon: ShoppingBag, title: "E-Commerce Development", desc: "Online stores designed to increase sales and customer engagement." },
-  { icon: Cpu, title: "Software Development", desc: "Custom software solutions tailored to your business requirements." },
-  { icon: BrainCircuit, title: "AI Advertisement Creation", desc: "High-converting AI-generated ad creatives and full campaigns." },
-  { icon: Share2, title: "Social Media Management", desc: "End-to-end content planning, growth strategy & community management." },
-  { icon: Palette, title: "Poster & Creative Design", desc: "Premium posters, branding materials and marketing creatives." },
-  { icon: TrendingUp, title: "Digital Marketing", desc: "Lead generation, paid advertising and full-funnel brand growth." },
+type ServiceItem = {
+  icon: typeof Code2;
+  title: string;
+  desc: string;
+  longDesc: string;
+  features: string[];
+  deliverables: string[];
+  timeline: string;
+};
+
+const SERVICES: ServiceItem[] = [
+  {
+    icon: Code2,
+    title: "Website Development",
+    desc: "Custom business websites built for performance, SEO and conversions.",
+    longDesc: "We design and build blazing-fast, mobile-first websites tailored to your brand. From corporate sites to portfolios and landing pages, every project is engineered for SEO, accessibility, and conversion.",
+    features: ["Custom responsive design", "Lightning-fast performance & SEO", "CMS integration (no-code editing)", "Lead capture & analytics", "Hosting & domain setup"],
+    deliverables: ["Design mockups", "Production website", "Admin training", "1 month free support"],
+    timeline: "2–4 weeks",
+  },
+  {
+    icon: ShoppingBag,
+    title: "E-Commerce Development",
+    desc: "Online stores designed to increase sales and customer engagement.",
+    longDesc: "Full-featured online stores with secure payments, inventory, AI product recommendations, and conversion-optimized checkout. Built on Shopify, WooCommerce, or fully custom.",
+    features: ["Product catalog & inventory", "Secure payment gateways (UPI, cards, wallets)", "Order & shipping management", "Coupons, upsells & abandoned-cart recovery", "WhatsApp order notifications"],
+    deliverables: ["Storefront", "Admin dashboard", "Payment & shipping setup", "Launch checklist"],
+    timeline: "3–6 weeks",
+  },
+  {
+    icon: Cpu,
+    title: "Software Development",
+    desc: "Custom software solutions tailored to your business requirements.",
+    longDesc: "From order management systems to billing software and internal tools — we build production-grade software that automates operations and scales with you.",
+    features: ["Custom dashboards & admin panels", "Role-based access & authentication", "Reports, exports & analytics", "Third-party API integrations", "Cloud deployment & maintenance"],
+    deliverables: ["Requirement doc", "Working software", "User manual", "Post-launch support"],
+    timeline: "4–10 weeks",
+  },
+  {
+    icon: BrainCircuit,
+    title: "AI Advertisement Creation",
+    desc: "High-converting AI-generated ad creatives and full campaigns.",
+    longDesc: "AI-powered ad creatives (image + video) and full campaign setup on Meta and Google. We blend creative direction with data so every rupee is measured.",
+    features: ["AI image & video ad creatives", "Hook-driven copywriting", "Meta & Google campaign setup", "Audience targeting & retargeting", "Weekly performance reports"],
+    deliverables: ["10+ creatives", "Campaign launch", "Pixel & conversion setup", "Monthly reports"],
+    timeline: "1–2 weeks setup, ongoing",
+  },
+  {
+    icon: Share2,
+    title: "Social Media Management",
+    desc: "End-to-end content planning, growth strategy & community management.",
+    longDesc: "We run your Instagram, Facebook, and YouTube end-to-end — content strategy, reels, posts, captions, hashtags, and community replies that compound growth.",
+    features: ["Monthly content calendar", "Reels, posts & story design", "Caption + hashtag strategy", "DM & comment management", "Monthly growth analytics"],
+    deliverables: ["15–30 posts/month", "Reels & stories", "Engagement reports"],
+    timeline: "Monthly retainer",
+  },
+  {
+    icon: Palette,
+    title: "Poster & Creative Design",
+    desc: "Premium posters, branding materials and marketing creatives.",
+    longDesc: "Festival posters, product launches, branding kits, and print-ready creatives — designed to make your brand stand out in any feed or store.",
+    features: ["Festival & promo posters", "Brand identity & logo design", "Product packaging & menus", "Print-ready files", "Editable source files"],
+    deliverables: ["Final creatives (PNG/PDF)", "Source files", "Mockups"],
+    timeline: "2–5 days per project",
+  },
+  {
+    icon: TrendingUp,
+    title: "Digital Marketing",
+    desc: "Lead generation, paid advertising and full-funnel brand growth.",
+    longDesc: "Full-funnel digital growth: SEO, paid ads, landing pages, email/WhatsApp marketing, and analytics — all wired to your business KPIs.",
+    features: ["SEO & content strategy", "Google & Meta ads", "Landing pages & funnels", "WhatsApp & email marketing", "GA4 & conversion tracking"],
+    deliverables: ["Growth roadmap", "Active campaigns", "Monthly reports"],
+    timeline: "Monthly retainer",
+  },
 ];
 
 function Services() {
+  const [active, setActive] = useState<ServiceItem | null>(null);
   return (
     <Section id="services">
       <div className="text-center max-w-2xl mx-auto">
@@ -258,11 +328,13 @@ function Services() {
 
       <div className="mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {SERVICES.map((s, i) => (
-          <motion.div
+          <motion.button
+            type="button"
+            onClick={() => setActive(s)}
             key={s.title}
             initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} variants={fade} custom={i}
             whileHover={{ y: -6 }}
-            className="group relative rounded-2xl glass border-gradient p-7 overflow-hidden"
+            className="group relative rounded-2xl glass border-gradient p-7 overflow-hidden text-left cursor-pointer"
           >
             <div className="absolute -top-20 -right-20 size-48 rounded-full bg-gradient-brand opacity-0 group-hover:opacity-20 blur-3xl transition-opacity duration-700" />
             <div className="relative">
@@ -271,13 +343,70 @@ function Services() {
               </div>
               <h3 className="text-lg font-semibold tracking-tight">{s.title}</h3>
               <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{s.desc}</p>
-              <div className="mt-5 inline-flex items-center gap-1.5 text-xs text-brand-cyan opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="mt-5 inline-flex items-center gap-1.5 text-xs text-brand-cyan opacity-80 group-hover:opacity-100 transition-opacity">
                 Learn more <ArrowRight className="size-3.5" />
               </div>
             </div>
-          </motion.div>
+          </motion.button>
         ))}
       </div>
+
+      <Dialog open={!!active} onOpenChange={(o) => !o && setActive(null)}>
+        <DialogContent className="max-w-2xl glass-strong border-white/10 max-h-[90vh] overflow-y-auto">
+          {active && (
+            <>
+              <DialogHeader>
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="size-11 rounded-xl bg-gradient-brand/20 grid place-items-center">
+                    <active.icon className="size-5 text-brand-cyan" />
+                  </div>
+                  <DialogTitle className="text-2xl">{active.title}</DialogTitle>
+                </div>
+                <DialogDescription className="text-base text-muted-foreground leading-relaxed">
+                  {active.longDesc}
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="mt-2 space-y-5">
+                <div>
+                  <div className="text-xs uppercase tracking-[0.18em] text-brand-cyan mb-2">What's included</div>
+                  <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
+                    {active.features.map((f) => (
+                      <li key={f} className="flex items-start gap-2 text-sm">
+                        <Check className="size-4 text-brand-cyan mt-0.5 shrink-0" />
+                        <span>{f}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div className="glass rounded-xl p-4">
+                    <div className="text-xs uppercase tracking-[0.18em] text-muted-foreground mb-2">Deliverables</div>
+                    <ul className="text-sm space-y-1">
+                      {active.deliverables.map((d) => <li key={d}>• {d}</li>)}
+                    </ul>
+                  </div>
+                  <div className="glass rounded-xl p-4">
+                    <div className="text-xs uppercase tracking-[0.18em] text-muted-foreground mb-2">Timeline</div>
+                    <div className="text-sm">{active.timeline}</div>
+                    <div className="mt-3 text-xs uppercase tracking-[0.18em] text-muted-foreground mb-2">Office</div>
+                    <div className="text-sm">Maharashtra, India</div>
+                    <div className="mt-1 text-xs text-muted-foreground">contact.productlensstudio@gmail.com</div>
+                    <div className="text-xs text-muted-foreground">+91 9096801036</div>
+                  </div>
+                </div>
+
+                <a href="#contact" onClick={() => setActive(null)} className="block">
+                  <Button className="w-full h-11 rounded-full bg-gradient-brand text-white hover:opacity-90 shadow-glow">
+                    Get a free consultation <ArrowRight className="size-4" />
+                  </Button>
+                </a>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </Section>
   );
 }
@@ -717,26 +846,28 @@ const leadSchema = z.object({
   email: z.string().trim().email("Enter a valid email").max(160),
   phone: z.string().trim().min(7, "Enter a valid number").max(20),
   service: z.string().min(1, "Pick a service"),
-  budget: z.string().min(1, "Pick a budget"),
   details: z.string().trim().min(10, "Tell us a bit more").max(1500),
 });
 type LeadForm = z.infer<typeof leadSchema>;
 
 const SERVICE_OPTIONS = ["Website Development","E-Commerce","Software Development","AI Advertisement","Social Media Management","Poster & Creative Design","Digital Marketing"];
-const BUDGET_OPTIONS = ["Under ₹50k","₹50k – ₹1.5L","₹1.5L – ₹5L","₹5L – ₹15L","₹15L+"];
 
 function ContactSection() {
+  const sendLeadFn = useServerFn(sendLead);
   const form = useForm<LeadForm>({
     resolver: zodResolver(leadSchema),
-    defaultValues: { fullName: "", business: "", email: "", phone: "", service: "", budget: "", details: "" },
+    defaultValues: { fullName: "", business: "", email: "", phone: "", service: "", details: "" },
   });
 
   const onSubmit = async (data: LeadForm) => {
-    // Backend hookup: connect Resend + a leads table to deliver emails.
-    console.log("New lead:", data);
-    await new Promise((r) => setTimeout(r, 700));
-    toast.success("Thanks! We received your request — we'll reach out within 24 hours.");
-    form.reset();
+    try {
+      await sendLeadFn({ data });
+      toast.success("Thanks! We received your request — we'll reach out within 24 hours.");
+      form.reset();
+    } catch (err) {
+      console.error(err);
+      toast.error("Couldn't send right now. Please try again or email us directly.");
+    }
   };
 
   return (
@@ -755,12 +886,13 @@ function ContactSection() {
           </div>
 
           {[
-            { icon: Mail, label: "Email", value: "hello@productlens.studio", href: "mailto:hello@productlens.studio" },
-            { icon: Phone, label: "Phone", value: "+91 98765 43210", href: "tel:+919876543210" },
-            { icon: MessageCircle, label: "WhatsApp", value: "Chat with us", href: "https://wa.me/919876543210" },
-            { icon: MapPin, label: "Office", value: "Mumbai, Maharashtra, India" },
+            { icon: Mail, label: "Email", value: "contact.productlensstudio@gmail.com", href: "mailto:contact.productlensstudio@gmail.com" },
+            { icon: Phone, label: "Phone", value: "+91 9096801036", href: "tel:+919096801036" },
+            { icon: MessageCircle, label: "WhatsApp", value: "Chat with us", href: "https://wa.me/919096801036" },
+            { icon: Instagram, label: "Instagram", value: "@product_lens.studio", href: "https://www.instagram.com/product_lens.studio?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" },
+            { icon: MapPin, label: "Office", value: "Maharashtra, India" },
           ].map((c) => (
-            <a key={c.label} href={c.href ?? "#"} className="glass rounded-2xl p-5 flex items-center gap-4 hover:bg-white/5 transition-colors">
+            <a key={c.label} href={c.href ?? "#"} target={c.href?.startsWith("http") ? "_blank" : undefined} rel="noopener noreferrer" className="glass rounded-2xl p-5 flex items-center gap-4 hover:bg-white/5 transition-colors">
               <div className="size-11 rounded-xl bg-gradient-brand/20 grid place-items-center">
                 <c.icon className="size-5 text-brand-cyan" />
               </div>
@@ -790,18 +922,14 @@ function ContactSection() {
             <Field label="Mobile Number" error={form.formState.errors.phone?.message}>
               <Input {...form.register("phone")} placeholder="+91 98xxx xxxxx" className="bg-white/5 border-white/10 h-11" />
             </Field>
-            <Field label="Service Required" error={form.formState.errors.service?.message}>
-              <Select onValueChange={(v) => form.setValue("service", v, { shouldValidate: true })} value={form.watch("service")}>
-                <SelectTrigger className="bg-white/5 border-white/10 h-11"><SelectValue placeholder="Choose service" /></SelectTrigger>
-                <SelectContent>{SERVICE_OPTIONS.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
-              </Select>
-            </Field>
-            <Field label="Budget Range" error={form.formState.errors.budget?.message}>
-              <Select onValueChange={(v) => form.setValue("budget", v, { shouldValidate: true })} value={form.watch("budget")}>
-                <SelectTrigger className="bg-white/5 border-white/10 h-11"><SelectValue placeholder="Choose budget" /></SelectTrigger>
-                <SelectContent>{BUDGET_OPTIONS.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
-              </Select>
-            </Field>
+            <div className="md:col-span-2">
+              <Field label="Service Required" error={form.formState.errors.service?.message}>
+                <Select onValueChange={(v) => form.setValue("service", v, { shouldValidate: true })} value={form.watch("service")}>
+                  <SelectTrigger className="bg-white/5 border-white/10 h-11"><SelectValue placeholder="Choose service" /></SelectTrigger>
+                  <SelectContent>{SERVICE_OPTIONS.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
+                </Select>
+              </Field>
+            </div>
           </div>
           <Field label="Project Details" error={form.formState.errors.details?.message}>
             <Textarea {...form.register("details")} rows={5} placeholder="Tell us about your goals, timeline, and what success looks like."
@@ -846,16 +974,15 @@ function Footer() {
             Design • Develop • Grow. A premium digital studio building products and campaigns that move the needle.
           </p>
           <div className="mt-5 flex items-center gap-3">
-            {[
-              { icon: Instagram, href: "#" },
-              { icon: Facebook, href: "#" },
-              { icon: Linkedin, href: "#" },
-              { icon: MessageCircle, href: "https://wa.me/919876543210" },
-            ].map((s, i) => (
-              <a key={i} href={s.href} aria-label="social" className="size-9 rounded-full glass grid place-items-center hover:bg-gradient-brand/20 transition-colors">
-                <s.icon className="size-4" />
-              </a>
-            ))}
+            <a
+              href="https://www.instagram.com/product_lens.studio?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram"
+              className="size-9 rounded-full glass grid place-items-center hover:bg-gradient-brand/20 transition-colors"
+            >
+              <Instagram className="size-4" />
+            </a>
           </div>
         </div>
         <div>
