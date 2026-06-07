@@ -174,27 +174,6 @@ function Hero() {
       <motion.div style={{ y: y1 }} className="absolute top-24 -left-10 size-72 rounded-full bg-gradient-brand blur-3xl opacity-30 animate-float" />
       <motion.div style={{ y: y2 }} className="absolute bottom-10 -right-20 size-96 rounded-full bg-gradient-to-tr from-brand-cyan to-brand-violet blur-3xl opacity-25 animate-float-slow" />
 
-      {/* floating glass cards */}
-      <motion.div
-        initial={{ opacity: 0, x: -40, rotate: -8 }} animate={{ opacity: 1, x: 0, rotate: -6 }}
-        transition={{ duration: 1, delay: 0.6 }}
-        className="hidden lg:block absolute left-8 top-1/2 glass rounded-2xl p-4 w-52 shadow-glow animate-float"
-      >
-        <div className="flex items-center gap-2 text-xs text-muted-foreground"><Zap className="size-3.5 text-brand-cyan" /> Live Project</div>
-        <div className="mt-2 text-sm font-medium">Conversion +218%</div>
-        <div className="mt-3 h-1.5 rounded-full bg-white/10 overflow-hidden">
-          <div className="h-full w-3/4 bg-gradient-brand" />
-        </div>
-      </motion.div>
-      <motion.div
-        initial={{ opacity: 0, x: 40, rotate: 6 }} animate={{ opacity: 1, x: 0, rotate: 4 }}
-        transition={{ duration: 1, delay: 0.8 }}
-        className="hidden lg:block absolute right-8 top-1/3 glass rounded-2xl p-4 w-56 shadow-glow animate-float-slow"
-      >
-        <div className="flex items-center gap-2 text-xs text-muted-foreground"><BrainCircuit className="size-3.5 text-brand-violet" /> AI Campaign</div>
-        <div className="mt-2 text-sm font-medium">CTR 11.4%</div>
-        <div className="mt-1 text-[11px] text-muted-foreground">↑ 3.2× industry avg</div>
-      </motion.div>
 
       <div className="relative max-w-6xl mx-auto text-center">
         <motion.div
@@ -633,15 +612,6 @@ function ContactSection() {
             </a>
           ))}
 
-          <div className="glass rounded-2xl overflow-hidden h-56">
-            <iframe
-              title="Office location"
-              src="https://www.google.com/maps?q=Mumbai%20Maharashtra&output=embed"
-              className="w-full h-full grayscale-[40%] contrast-110 opacity-90"
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-            />
-          </div>
         </div>
 
         {/* right: form */}
@@ -763,7 +733,7 @@ function HomePage() {
         <Hero />
         <Services />
         <WhyUs />
-        <Stats />
+        
         <Process />
         <Portfolio />
         <Team />
