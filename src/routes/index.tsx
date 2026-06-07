@@ -763,7 +763,7 @@ function HomePage() {
         <Hero />
         <Services />
         <WhyUs />
-        <Stats />
+        
         <Process />
         <Portfolio />
         <Team />
