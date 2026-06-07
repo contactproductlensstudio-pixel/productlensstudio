@@ -7,7 +7,7 @@ import { z } from "zod";
 import { toast } from "sonner";
 import {
   ArrowRight, Sparkles, Code2, ShoppingBag, Cpu, Megaphone, Share2, Palette, TrendingUp,
-  Check, Mail, Phone, MapPin, MessageCircle, Instagram, Facebook, Linkedin, Star, Menu, X,
+  Check, Mail, Phone, MapPin, MessageCircle, Instagram, Star, Menu, X,
   Rocket, Target, Zap, Users, Award, HeadphonesIcon, BrainCircuit,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
