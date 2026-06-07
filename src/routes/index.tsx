@@ -434,13 +434,24 @@ function Process() {
 
 /* ---------------- portfolio ---------------- */
 
+import vithalAiImg from "@/assets/vithal-ai.png.asset.json";
+import shreeAlankarImg from "@/assets/shree-alankar.png.asset.json";
+
 const WORK = [
-  { tag: "Website", title: "Luxe Realty Group", color: "from-brand-violet to-brand-blue" },
-  { tag: "E-Commerce", title: "Aura Skincare Store", color: "from-brand-cyan to-brand-blue" },
-  { tag: "Software", title: "FleetOps Dashboard", color: "from-brand-blue to-brand-violet" },
-  { tag: "Social", title: "Café Nova Campaign", color: "from-brand-violet to-brand-cyan" },
-  { tag: "AI Ads", title: "FitForge Creative Suite", color: "from-brand-cyan to-brand-violet" },
-  { tag: "Poster", title: "Mumbai Music Fest", color: "from-brand-blue to-brand-cyan" },
+  {
+    tag: "AI-Powered Platform",
+    title: "Vithal AI",
+    desc: "Your AI Companion for Everything — built for India.",
+    url: "https://vithalai.netlify.app/",
+    image: vithalAiImg.url,
+  },
+  {
+    tag: "Jewellery Shop Website",
+    title: "Shree Alankar",
+    desc: "Premium gold & silver jewellery shop, Lohoner — since 1998.",
+    url: "https://shreealankarjewels.netlify.app/",
+    image: shreeAlankarImg.url,
+  },
 ];
 
 function Portfolio() {
@@ -457,39 +468,37 @@ function Portfolio() {
           Start your project <ArrowRight className="size-4" />
         </a>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {WORK.map((w, i) => (
-          <motion.div
+          <motion.a
             key={w.title}
+            href={w.url}
+            target="_blank"
+            rel="noopener noreferrer"
             initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} variants={fade} custom={i}
             whileHover={{ y: -6 }}
-            className="group rounded-2xl glass border-gradient overflow-hidden"
+            className="group rounded-2xl glass border-gradient overflow-hidden block"
           >
-            <div className={`aspect-[4/3] bg-gradient-to-br ${w.color} relative overflow-hidden`}>
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.25),transparent_50%)]" />
-              <div className="absolute inset-0 grid-bg opacity-30" />
-              <motion.div
-                className="absolute inset-0 grid place-items-center"
-                whileHover={{ scale: 1.05 }}
-              >
-                <div className="text-2xl font-semibold tracking-tight text-white/90 px-6 text-center">{w.title}</div>
-              </motion.div>
+            <div className="aspect-[16/9] relative overflow-hidden bg-black">
+              <img src={w.image} alt={w.title} className="absolute inset-0 w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700" loading="lazy" />
             </div>
-            <div className="p-5 flex items-center justify-between">
+            <div className="p-5 flex items-center justify-between gap-4">
               <div>
                 <div className="text-[11px] uppercase tracking-[0.18em] text-brand-cyan">{w.tag}</div>
-                <div className="mt-1 text-sm font-medium">{w.title}</div>
+                <div className="mt-1 text-base font-medium">{w.title}</div>
+                <div className="mt-1 text-sm text-muted-foreground">{w.desc}</div>
               </div>
-              <div className="size-9 rounded-full glass-strong grid place-items-center group-hover:bg-gradient-brand transition-colors">
+              <div className="size-10 shrink-0 rounded-full glass-strong grid place-items-center group-hover:bg-gradient-brand transition-colors">
                 <ArrowRight className="size-4" />
               </div>
             </div>
-          </motion.div>
+          </motion.a>
         ))}
       </div>
     </Section>
   );
 }
+
 
 /* ---------------- testimonials ---------------- */
 
