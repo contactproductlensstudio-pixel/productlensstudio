@@ -974,16 +974,15 @@ function Footer() {
             Design • Develop • Grow. A premium digital studio building products and campaigns that move the needle.
           </p>
           <div className="mt-5 flex items-center gap-3">
-            {[
-              { icon: Instagram, href: "#" },
-              { icon: Facebook, href: "#" },
-              { icon: Linkedin, href: "#" },
-              { icon: MessageCircle, href: "https://wa.me/919876543210" },
-            ].map((s, i) => (
-              <a key={i} href={s.href} aria-label="social" className="size-9 rounded-full glass grid place-items-center hover:bg-gradient-brand/20 transition-colors">
-                <s.icon className="size-4" />
-              </a>
-            ))}
+            <a
+              href="https://www.instagram.com/product_lens.studio?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram"
+              className="size-9 rounded-full glass grid place-items-center hover:bg-gradient-brand/20 transition-colors"
+            >
+              <Instagram className="size-4" />
+            </a>
           </div>
         </div>
         <div>
