@@ -515,7 +515,17 @@ const SOFTWARE: SoftwareItem[] = [
 ];
 
 function Portfolio() {
-  const [tab, setTab] = useState<"websites" | "software">("websites");
+  const [lightbox, setLightbox] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!lightbox) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setLightbox(null); };
+    window.addEventListener("keydown", onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { window.removeEventListener("keydown", onKey); document.body.style.overflow = prev; };
+  }, [lightbox]);
+
   return (
     <Section id="portfolio">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
@@ -530,89 +540,109 @@ function Portfolio() {
         </a>
       </div>
 
-      <div className="inline-flex p-1 rounded-full glass border-gradient mb-10">
-        {(["websites", "software"] as const).map((k) => (
-          <button
-            key={k}
-            onClick={() => setTab(k)}
-            className={`px-5 py-2 text-sm rounded-full capitalize transition-colors ${
-              tab === k ? "bg-gradient-brand text-white" : "text-muted-foreground hover:text-foreground"
-            }`}
+      {/* Websites */}
+      <div className="mb-6 flex items-center gap-3">
+        <span className="text-[11px] uppercase tracking-[0.2em] text-brand-cyan">Websites</span>
+        <span className="h-px flex-1 bg-white/10" />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {WEBSITES.map((w, i) => (
+          <motion.a
+            key={w.title}
+            href={w.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} variants={fade} custom={i}
+            whileHover={{ y: -6 }}
+            className="group rounded-2xl glass border-gradient overflow-hidden block"
           >
-            {k}
-          </button>
+            <div className="aspect-[16/9] relative overflow-hidden bg-black">
+              <img src={w.image} alt={w.title} className="absolute inset-0 w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700" loading="lazy" />
+            </div>
+            <div className="p-5 flex items-center justify-between gap-4">
+              <div>
+                <div className="text-[11px] uppercase tracking-[0.18em] text-brand-cyan">{w.tag}</div>
+                <div className="mt-1 text-base font-medium">{w.title}</div>
+                <div className="mt-1 text-sm text-muted-foreground">{w.desc}</div>
+              </div>
+              <div className="size-10 shrink-0 rounded-full glass-strong grid place-items-center group-hover:bg-gradient-brand transition-colors">
+                <ArrowRight className="size-4" />
+              </div>
+            </div>
+          </motion.a>
         ))}
       </div>
 
-      {tab === "websites" && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {WEBSITES.map((w, i) => (
-            <motion.a
-              key={w.title}
-              href={w.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} variants={fade} custom={i}
-              whileHover={{ y: -6 }}
-              className="group rounded-2xl glass border-gradient overflow-hidden block"
-            >
-              <div className="aspect-[16/9] relative overflow-hidden bg-black">
-                <img src={w.image} alt={w.title} className="absolute inset-0 w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700" loading="lazy" />
+      {/* Software */}
+      <div className="mt-16 mb-6 flex items-center gap-3">
+        <span className="text-[11px] uppercase tracking-[0.2em] text-brand-cyan">Software</span>
+        <span className="h-px flex-1 bg-white/10" />
+      </div>
+      <div className="grid grid-cols-1 gap-6">
+        {SOFTWARE.map((s, i) => (
+          <motion.div
+            key={s.title}
+            initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.15 }} variants={fade} custom={i}
+            className="rounded-2xl glass border-gradient overflow-hidden"
+          >
+            {s.images && (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-white/5">
+                {s.images.map((src, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => setLightbox(src)}
+                    className="aspect-[16/10] relative overflow-hidden bg-black group cursor-zoom-in"
+                    aria-label={`Open screenshot ${idx + 1}`}
+                  >
+                    <img src={src} alt={`${s.title} screenshot ${idx + 1}`} className="absolute inset-0 w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700" loading="lazy" />
+                  </button>
+                ))}
               </div>
-              <div className="p-5 flex items-center justify-between gap-4">
-                <div>
-                  <div className="text-[11px] uppercase tracking-[0.18em] text-brand-cyan">{w.tag}</div>
-                  <div className="mt-1 text-base font-medium">{w.title}</div>
-                  <div className="mt-1 text-sm text-muted-foreground">{w.desc}</div>
-                </div>
-                <div className="size-10 shrink-0 rounded-full glass-strong grid place-items-center group-hover:bg-gradient-brand transition-colors">
-                  <ArrowRight className="size-4" />
-                </div>
+            )}
+            <div className="p-6 md:p-8">
+              <div className="flex items-center gap-3 flex-wrap">
+                <span className="text-[11px] uppercase tracking-[0.18em] text-brand-cyan">{s.tag}</span>
+                {s.locked && (
+                  <span className="text-[10px] uppercase tracking-[0.15em] px-2 py-0.5 rounded-full glass-strong text-muted-foreground">
+                    Screenshots hidden — confidential
+                  </span>
+                )}
               </div>
-            </motion.a>
-          ))}
-        </div>
-      )}
+              <h3 className="mt-2 text-2xl md:text-3xl font-semibold">{s.title}</h3>
+              <p className="mt-3 text-muted-foreground max-w-3xl">{s.desc}</p>
+              <ul className="mt-5 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2">
+                {s.features.map((f) => (
+                  <li key={f} className="flex items-start gap-2 text-sm">
+                    <Check className="size-4 text-brand-cyan mt-0.5 shrink-0" />
+                    <span>{f}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </motion.div>
+        ))}
+      </div>
 
-      {tab === "software" && (
-        <div className="grid grid-cols-1 gap-6">
-          {SOFTWARE.map((s, i) => (
-            <motion.div
-              key={s.title}
-              initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.15 }} variants={fade} custom={i}
-              className="rounded-2xl glass border-gradient overflow-hidden"
-            >
-              {s.images && (
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-white/5">
-                  {s.images.map((src, idx) => (
-                    <div key={idx} className="aspect-[16/10] relative overflow-hidden bg-black">
-                      <img src={src} alt={`${s.title} screenshot ${idx + 1}`} className="absolute inset-0 w-full h-full object-cover object-top hover:scale-105 transition-transform duration-700" loading="lazy" />
-                    </div>
-                  ))}
-                </div>
-              )}
-              <div className="p-6 md:p-8">
-                <div className="flex items-center gap-3 flex-wrap">
-                  <span className="text-[11px] uppercase tracking-[0.18em] text-brand-cyan">{s.tag}</span>
-                  {s.locked && (
-                    <span className="text-[10px] uppercase tracking-[0.15em] px-2 py-0.5 rounded-full glass-strong text-muted-foreground">
-                      Screenshots hidden — confidential
-                    </span>
-                  )}
-                </div>
-                <h3 className="mt-2 text-2xl md:text-3xl font-semibold">{s.title}</h3>
-                <p className="mt-3 text-muted-foreground max-w-3xl">{s.desc}</p>
-                <ul className="mt-5 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2">
-                  {s.features.map((f) => (
-                    <li key={f} className="flex items-start gap-2 text-sm">
-                      <Check className="size-4 text-brand-cyan mt-0.5 shrink-0" />
-                      <span>{f}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </motion.div>
-          ))}
+      {lightbox && (
+        <div
+          className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 cursor-zoom-out"
+          onClick={() => setLightbox(null)}
+        >
+          <button
+            type="button"
+            onClick={() => setLightbox(null)}
+            className="absolute top-4 right-4 size-10 rounded-full glass-strong grid place-items-center text-white"
+            aria-label="Close"
+          >
+            <X className="size-5" />
+          </button>
+          <img
+            src={lightbox}
+            alt="Screenshot preview"
+            className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          />
         </div>
       )}
     </Section>
