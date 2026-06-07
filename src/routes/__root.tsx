@@ -78,14 +78,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
+      { title: "Product Lens Studio" },
+      { name: "description", content: "Transforming businesses through modern websites, software, AI-powered marketing, and creative digital solutions." },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { property: "og:title", content: "Product Lens Studio" },
+      { property: "og:description", content: "Transforming businesses through modern websites, software, AI-powered marketing, and creative digital solutions." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "Product Lens Studio" },
+      { name: "twitter:description", content: "Transforming businesses through modern websites, software, AI-powered marketing, and creative digital solutions." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/d1b9f4c3-c82d-4de1-a1e8-98982c94b823" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/d1b9f4c3-c82d-4de1-a1e8-98982c94b823" },
     ],
     links: [
       {
