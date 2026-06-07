@@ -436,8 +436,12 @@ function Process() {
 
 import vithalAiImg from "@/assets/vithal-ai.png.asset.json";
 import shreeAlankarImg from "@/assets/shree-alankar.png.asset.json";
+import omsDashboardImg from "@/assets/oms-dashboard.png.asset.json";
+import omsOrdersImg from "@/assets/oms-orders.png.asset.json";
+import omsAiToolsImg from "@/assets/oms-ai-tools.png.asset.json";
+import omsProfitImg from "@/assets/oms-profit.png.asset.json";
 
-const WORK = [
+const WEBSITES = [
   {
     tag: "AI-Powered Platform",
     title: "Vithal AI",
@@ -454,10 +458,67 @@ const WORK = [
   },
 ];
 
+type SoftwareItem = {
+  tag: string;
+  title: string;
+  desc: string;
+  features: string[];
+  images?: string[];
+  locked?: boolean;
+};
+
+const SOFTWARE: SoftwareItem[] = [
+  {
+    tag: "E-commerce Management Software",
+    title: "Ganesha Rangoli — Order Management System",
+    desc:
+      "A fully AI-powered order management platform built for D2C e-commerce sellers. Real-time dashboard, lifetime profit & order analytics, smart customer order tracking, AI-powered priority scoring, best-time / best-product alerts, AI stock & inventory prediction, multilingual AI business analysis (English & Marathi), and an AI actual profit calculator — everything a modern online seller needs in one place.",
+    features: [
+      "Live dashboard — profit, orders, AOV, delivery status",
+      "Customer orders with search, tracking & status updates",
+      "AI Smart Order Priority Scorer",
+      "AI Best Time / Best Product Alerts",
+      "AI Stock & Inventory Predictor (7/15/30 day forecast)",
+      "Vithal AI Business Analysis (English + मराठी)",
+      "AI Actual Profit Calculator with cost settings",
+    ],
+    images: [omsDashboardImg.url, omsOrdersImg.url, omsAiToolsImg.url, omsProfitImg.url],
+  },
+  {
+    tag: "Retail Billing Software",
+    title: "Jewelry Shop Billing Software",
+    desc:
+      "End-to-end billing & inventory software for jewellers — GST invoicing, daily gold/silver rate auto-update, stock by purity & weight, customer ledger, old-gold exchange, BIS hallmark tracking, and one-tap WhatsApp bill sharing.",
+    features: [
+      "GST-ready jewellery billing & estimate",
+      "Live gold/silver rate-based pricing",
+      "Stock by purity, weight & making charges",
+      "Customer ledger & udhaar tracking",
+      "WhatsApp bill & payment reminders",
+    ],
+    locked: true,
+  },
+  {
+    tag: "NBFC / Finance Software",
+    title: "Gold Loan Software",
+    desc:
+      "Complete gold loan management for pawnbrokers & NBFCs — KYC, gold valuation, loan disbursal, interest auto-calculation, auction tracking, and compliance-ready reports.",
+    features: [
+      "Customer KYC & gold packet tracking",
+      "Auto interest & EMI calculation",
+      "Renewal, part-payment & closure flows",
+      "Auction & NPA management",
+      "Daily / monthly compliance reports",
+    ],
+    locked: true,
+  },
+];
+
 function Portfolio() {
+  const [tab, setTab] = useState<"websites" | "software">("websites");
   return (
     <Section id="portfolio">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
         <div>
           <SectionLabel>Selected work</SectionLabel>
           <h2 className="text-4xl md:text-6xl font-semibold tracking-[-0.02em] max-w-2xl">
@@ -468,33 +529,92 @@ function Portfolio() {
           Start your project <ArrowRight className="size-4" />
         </a>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {WORK.map((w, i) => (
-          <motion.a
-            key={w.title}
-            href={w.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} variants={fade} custom={i}
-            whileHover={{ y: -6 }}
-            className="group rounded-2xl glass border-gradient overflow-hidden block"
+
+      <div className="inline-flex p-1 rounded-full glass border-gradient mb-10">
+        {(["websites", "software"] as const).map((k) => (
+          <button
+            key={k}
+            onClick={() => setTab(k)}
+            className={`px-5 py-2 text-sm rounded-full capitalize transition-colors ${
+              tab === k ? "bg-gradient-brand text-white" : "text-muted-foreground hover:text-foreground"
+            }`}
           >
-            <div className="aspect-[16/9] relative overflow-hidden bg-black">
-              <img src={w.image} alt={w.title} className="absolute inset-0 w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700" loading="lazy" />
-            </div>
-            <div className="p-5 flex items-center justify-between gap-4">
-              <div>
-                <div className="text-[11px] uppercase tracking-[0.18em] text-brand-cyan">{w.tag}</div>
-                <div className="mt-1 text-base font-medium">{w.title}</div>
-                <div className="mt-1 text-sm text-muted-foreground">{w.desc}</div>
-              </div>
-              <div className="size-10 shrink-0 rounded-full glass-strong grid place-items-center group-hover:bg-gradient-brand transition-colors">
-                <ArrowRight className="size-4" />
-              </div>
-            </div>
-          </motion.a>
+            {k}
+          </button>
         ))}
       </div>
+
+      {tab === "websites" && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {WEBSITES.map((w, i) => (
+            <motion.a
+              key={w.title}
+              href={w.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} variants={fade} custom={i}
+              whileHover={{ y: -6 }}
+              className="group rounded-2xl glass border-gradient overflow-hidden block"
+            >
+              <div className="aspect-[16/9] relative overflow-hidden bg-black">
+                <img src={w.image} alt={w.title} className="absolute inset-0 w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700" loading="lazy" />
+              </div>
+              <div className="p-5 flex items-center justify-between gap-4">
+                <div>
+                  <div className="text-[11px] uppercase tracking-[0.18em] text-brand-cyan">{w.tag}</div>
+                  <div className="mt-1 text-base font-medium">{w.title}</div>
+                  <div className="mt-1 text-sm text-muted-foreground">{w.desc}</div>
+                </div>
+                <div className="size-10 shrink-0 rounded-full glass-strong grid place-items-center group-hover:bg-gradient-brand transition-colors">
+                  <ArrowRight className="size-4" />
+                </div>
+              </div>
+            </motion.a>
+          ))}
+        </div>
+      )}
+
+      {tab === "software" && (
+        <div className="grid grid-cols-1 gap-6">
+          {SOFTWARE.map((s, i) => (
+            <motion.div
+              key={s.title}
+              initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.15 }} variants={fade} custom={i}
+              className="rounded-2xl glass border-gradient overflow-hidden"
+            >
+              {s.images && (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-white/5">
+                  {s.images.map((src, idx) => (
+                    <div key={idx} className="aspect-[16/10] relative overflow-hidden bg-black">
+                      <img src={src} alt={`${s.title} screenshot ${idx + 1}`} className="absolute inset-0 w-full h-full object-cover object-top hover:scale-105 transition-transform duration-700" loading="lazy" />
+                    </div>
+                  ))}
+                </div>
+              )}
+              <div className="p-6 md:p-8">
+                <div className="flex items-center gap-3 flex-wrap">
+                  <span className="text-[11px] uppercase tracking-[0.18em] text-brand-cyan">{s.tag}</span>
+                  {s.locked && (
+                    <span className="text-[10px] uppercase tracking-[0.15em] px-2 py-0.5 rounded-full glass-strong text-muted-foreground">
+                      Screenshots hidden — confidential
+                    </span>
+                  )}
+                </div>
+                <h3 className="mt-2 text-2xl md:text-3xl font-semibold">{s.title}</h3>
+                <p className="mt-3 text-muted-foreground max-w-3xl">{s.desc}</p>
+                <ul className="mt-5 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2">
+                  {s.features.map((f) => (
+                    <li key={f} className="flex items-start gap-2 text-sm">
+                      <Check className="size-4 text-brand-cyan mt-0.5 shrink-0" />
+                      <span>{f}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      )}
     </Section>
   );
 }
