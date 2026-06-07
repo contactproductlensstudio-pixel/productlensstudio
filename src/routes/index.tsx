@@ -633,15 +633,6 @@ function ContactSection() {
             </a>
           ))}
 
-          <div className="glass rounded-2xl overflow-hidden h-56">
-            <iframe
-              title="Office location"
-              src="https://www.google.com/maps?q=Mumbai%20Maharashtra&output=embed"
-              className="w-full h-full grayscale-[40%] contrast-110 opacity-90"
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-            />
-          </div>
         </div>
 
         {/* right: form */}
